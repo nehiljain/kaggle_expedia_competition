@@ -1,0 +1,52 @@
+---
+title: "ExpediaEDA"
+author: "Nehil"
+date: "June 10, 2016"
+output: html_document
+---
+
+http://r4ds.had.co.nz/exploratory-data-analysis-eda.html
+
+This on expedia dataset which comes form 
+https://www.kaggle.com/c/expedia-hotel-recommendations/data
+https://www.dataquest.io/blog/kaggle-tutorial/
+
+```{r}
+library(dplyr)
+library(pryr)
+library(tidyr)
+library(data.table)
+library(readr)
+library(ggplot2)
+train_df <- fread(input = '~/code/personal/expedia_kaggle/train.csv', sep = ',', header = T, showProgress = T, select = c('is_mobile'))
+ggplot(data = train_df) + geom_bar(mapping = aes(as.factor(is_mobile)))
+```
+
+
+
+```{r}
+rm(train_df)
+train_df <- fread(input = '~/code/personal/expedia_kaggle/train.csv', sep = ',', header = T, showProgress = T, select = c('is_booking'))
+ggplot(data = train_df) + geom_bar(mapping = aes(as.factor(is_booking)))
+```
+
+
+You can also embed plots, for example:
+
+```{r, echo=FALSE}
+rm(list = ls())
+train_dt <- fread(input = '~/code/personal/expedia_kaggle/train.csv', sep = ',', header = T, showProgress = T, select = c('hotel_cluster'))
+train_tbl <- tbl_dt(train_dr)
+agg <- train_tbl %>% group_by(hotel_cluster) %>% tally(sort = T)
+ggplot(agg) + geom_bar(mapping = aes(x=hotel_cluster, y = n),stat = 'identity')
+```
+
+
+```{r}
+train_dt <- fread(input = '~/code/personal/expedia_kaggle/train.csv', sep = ',', header = T, showProgress = T, select = c('user_id'))
+test_dt <- fread(input = '~/code/personal/expedia_kaggle/test.csv', sep = ',', header = T, showProgress = T, select = c('user_id'))
+test_dt <- tbl_dt(test_dt)
+train_dt <- tbl_dt(train_dt)
+setdiff(test_dt %>% select(user_id) %>% distinct(), train_df %>% select(user_id) %>% distinct())
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
