@@ -18,9 +18,12 @@ library(tidyr)
 library(data.table)
 library(readr)
 library(ggplot2)
+library(feather)
 train_df <- fread(input = '~/code/personal/expedia_kaggle/train.csv', sep = ',', header = T, showProgress = T, select = c('is_mobile'))
 ggplot(data = train_df) + geom_bar(mapping = aes(as.factor(is_mobile)))
 ```
+
+
 
 
 
@@ -36,8 +39,8 @@ You can also embed plots, for example:
 ```{r, echo=FALSE}
 rm(list = ls())
 train_dt <- fread(input = '~/code/personal/expedia_kaggle/train.csv', sep = ',', header = T, showProgress = T, select = c('hotel_cluster'))
-train_tbl <- tbl_dt(train_dr)
-agg <- train_tbl %>% group_by(hotel_cluster) %>% tally(sort = T)
+train_tbl <- tbl_dt(train_dt)
+agg <- train_tbl %>% group_by(hotel_cluster) %>% tally(sort = T) %>% arrange(n)
 ggplot(agg) + geom_bar(mapping = aes(x=hotel_cluster, y = n),stat = 'identity')
 ```
 
@@ -49,4 +52,43 @@ test_dt <- tbl_dt(test_dt)
 train_dt <- tbl_dt(train_dt)
 setdiff(test_dt %>% select(user_id) %>% distinct(), train_df %>% select(user_id) %>% distinct())
 
+
+train_df2 <- sub_train_df %>% filter((entry_year == 2014 & entry_month > 8))
+
+
+
+library(Metrics)
+actual_l = as.list(train_df2$hotel_cluster)
+predictions  <- rep(list(c(agg$hotel_cluster[1:5])), nrow(train_df2))
+mapk(5, actual_l, predictions)
+```
+
+
+
+
+
+
+```{r}
+destination_df <- read_csv('destinations.csv')
+trans_dest1 = destination_df %>% select(-1) %>% prcomp()
+pca_predict <- tbl_df(as.data.frame(pca_predict)) %>% select(1:3)
+pca_predict <- tbl_df(as.data.frame(pca_predict)) %>% select(1:3)
+small_df <- bind_cols(select(destination_df,srch_destination_id),  pca_predict)
+
+df <- read_csv('sub_train_df.csv')
+df <- df %>% mutate(date_time_year = as.numeric(strftime(date_time,format = "%Y")),
+                    date_time_month = as.numeric(strftime(date_time,format = "%m")),
+                    date_time_day = as.numeric(strftime(date_time,format = "%d")),
+                    date_time_day_of_week = weekdays(as.Date(date_time), F),
+                    srch_ci_year = as.numeric(strftime(srch_ci,format = "%Y")),
+                    srch_ci_month = as.numeric(strftime(srch_ci,format = "%m")),
+                    srch_ci_day = as.numeric(strftime(srch_ci,format = "%d")),
+                    srch_ci_day_of_week = weekdays(srch_ci, F),
+                    srch_co_year = as.numeric(strftime(srch_ci,format = "%Y")),
+                    srch_co_month = as.numeric(strftime(srch_ci,format = "%m")),
+                    srch_co_day = as.numeric(strftime(srch_ci,format = "%d")),
+                    srch_co_day_of_week = weekdays(srch_co, F)
+                    )
+
+```
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

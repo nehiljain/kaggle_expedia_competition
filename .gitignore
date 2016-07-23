@@ -134,3 +134,4 @@ ENV/
 *.zip
 *.gz
 *.feather
+.Rproj.user
